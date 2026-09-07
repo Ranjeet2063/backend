@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
-import { ValidationPipe, LoggerService, Logger } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
@@ -22,7 +22,6 @@ function resolveLogLevels(level: string): LogLevel[] {
   return LOG_LEVEL_MAP[level.toLowerCase()] ?? LOG_LEVEL_MAP.log;
 }
 
-
 async function bootstrap() {
   // rawBody: true preserves the raw request buffer on req.rawBody, which the
   // GitHub webhooks controller needs to verify the HMAC-SHA256 signature.
@@ -32,7 +31,7 @@ async function bootstrap() {
 
   const env = configService.get('env', { infer: true });
   const logLevel = configService.get('logLevel', { infer: true });
-app.useLogger(resolveLogLevels(logLevel || 'log'));
+  app.useLogger(resolveLogLevels(logLevel || 'log'));
 
   // Fail fast and loudly if *any* required-in-production secret is missing —
   // not just JWT_SECRET. An empty GITHUB_WEBHOOK_SECRET, TREASURY_SECRET,

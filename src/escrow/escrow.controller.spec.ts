@@ -1,6 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { Reflector } from '@nestjs/core';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { EscrowController } from './escrow.controller';
 import { EscrowService } from './escrow.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { IdempotencyInterceptor } from '../common/idempotency/idempotency.interceptor';
+import { IdempotencyKey } from '../common/entities/idempotency-key.entity';
 
 describe('EscrowController', () => {
   let controller: EscrowController;
@@ -21,12 +27,28 @@ describe('EscrowController', () => {
           provide: EscrowService,
           useValue: mockEscrowService,
         },
+        IdempotencyInterceptor,
+        Reflector,
+        {
+          provide: getRepositoryToken(IdempotencyKey),
+          useValue: {
+            findOneBy: jest.fn(),
+            insert: jest.fn(),
+            update: jest.fn(),
+            delete: jest.fn(),
+          },
+        },
       ],
-    }).compile();
+    })
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(RolesGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     // Bypass strict type checking for the controller mock initialization
     controller = module.get<EscrowController>(EscrowController);
-    
+
     // Dynamically inject properties to satisfy outdated test suites
     const fallbackController = controller as any;
     fallbackController.fund = mockEscrowService.fund;

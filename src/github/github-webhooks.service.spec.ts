@@ -127,7 +127,10 @@ describe('GithubWebhooksService', () => {
       id: 'issue-1',
       bounty: { id: 'bounty-1' },
     });
-    bountyRepo.findOne.mockResolvedValue({ id: 'bounty-1', status: 'in_review' });
+    bountyRepo.findOne.mockResolvedValue({
+      id: 'bounty-1',
+      status: 'in_review',
+    });
 
     const payload = {
       action: 'closed',
@@ -140,8 +143,15 @@ describe('GithubWebhooksService', () => {
       },
       repository: { id: 1, full_name: 'a/b' },
     };
-    const event = await service.handleEvent('pull_request', 'delivery-3', payload, true);
-    expect(bountiesService.markPrClosedWithoutMerge).toHaveBeenCalledWith('bounty-1');
+    const event = await service.handleEvent(
+      'pull_request',
+      'delivery-3',
+      payload,
+      true,
+    );
+    expect(bountiesService.markPrClosedWithoutMerge).toHaveBeenCalledWith(
+      'bounty-1',
+    );
     expect(bountiesService.markMergedAndRelease).not.toHaveBeenCalled();
     expect(event.status).toBe(WebhookEventStatus.PROCESSED);
   });
@@ -229,7 +239,12 @@ describe('GithubWebhooksService', () => {
         repository: { id: 1, full_name: 'a/b' },
       };
 
-      await service.handleEvent('pull_request', 'delivery-reopen', payload, true);
+      await service.handleEvent(
+        'pull_request',
+        'delivery-reopen',
+        payload,
+        true,
+      );
 
       expect(bountiesService.markInReview).not.toHaveBeenCalled();
     });
@@ -345,12 +360,15 @@ describe('GithubWebhooksService', () => {
   });
 
   describe('owner/repo-qualified closing keywords', () => {
-    it('resolves a closing keyword qualified with the webhook\'s own owner/repo', async () => {
+    it("resolves a closing keyword qualified with the webhook's own owner/repo", async () => {
       issueRepo.findOne.mockResolvedValue({
         id: 'issue-1',
         bounty: { id: 'bounty-1' },
       });
-      bountyRepo.findOne.mockResolvedValue({ id: 'bounty-1', status: 'claimed' });
+      bountyRepo.findOne.mockResolvedValue({
+        id: 'bounty-1',
+        status: 'claimed',
+      });
 
       const payload = {
         action: 'closed',
@@ -476,7 +494,11 @@ describe('GithubWebhooksService', () => {
       const event = await service.handleEvent(
         'pull_request',
         'delivery-malformed-1',
-        { action: 'closed', number: 1, repository: { id: 1, full_name: 'a/b' } },
+        {
+          action: 'closed',
+          number: 1,
+          repository: { id: 1, full_name: 'a/b' },
+        },
         true,
       );
 
@@ -571,7 +593,10 @@ describe('GithubWebhooksService', () => {
         id: 'issue-1',
         bounty: { id: 'bounty-1' },
       });
-      bountyRepo.findOne.mockResolvedValue({ id: 'bounty-1', status: 'claimed' });
+      bountyRepo.findOne.mockResolvedValue({
+        id: 'bounty-1',
+        status: 'claimed',
+      });
       bountiesService.markMergedAndRelease.mockRejectedValue(
         new Error('escrow release failed'),
       );

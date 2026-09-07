@@ -64,7 +64,7 @@ export class AuthController {
   @Post('handoff')
   @HttpCode(200)
   @ApiExcludeEndpoint()
-  async exchangeHandoff(@Body('code') code: string) {
+  exchangeHandoff(@Body('code') code: string) {
     if (!code || typeof code !== 'string') {
       throw new UnauthorizedException('Missing handoff code');
     }
@@ -78,7 +78,7 @@ export class AuthController {
   @Post('exchange')
   @HttpCode(200)
   @ApiExcludeEndpoint()
-  async exchangeHandoffAlias(@Body('code') code: string) {
+  exchangeHandoffAlias(@Body('code') code: string) {
     // Alias for POST /auth/exchange — same single-use semantics as /handoff.
     if (!code || typeof code !== 'string') {
       throw new UnauthorizedException('Missing handoff code');

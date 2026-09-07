@@ -21,10 +21,11 @@ describe('TeamsService', () => {
     };
     splitRepo = {
       create: jest.fn((s: Partial<TeamMemberSplit>) => s),
-      save: jest.fn((s: Partial<TeamMemberSplit> | Partial<TeamMemberSplit>[]) =>
-        Array.isArray(s)
-          ? Promise.resolve(s.map((x) => ({ id: `split-${x.userId}`, ...x })))
-          : Promise.resolve({ id: `split-${s.userId}`, ...s }),
+      save: jest.fn(
+        (s: Partial<TeamMemberSplit> | Partial<TeamMemberSplit>[]) =>
+          Array.isArray(s)
+            ? Promise.resolve(s.map((x) => ({ id: `split-${x.userId}`, ...x })))
+            : Promise.resolve({ id: `split-${s.userId}`, ...s }),
       ),
       delete: jest.fn().mockResolvedValue(undefined),
     };
@@ -52,7 +53,9 @@ describe('TeamsService', () => {
           name: 'Team A',
           members: [{ userId: 'u1', percentage: 60 }],
         }),
-      ).rejects.toThrow('Team split percentages must sum to 100, got 60.00');
+      ).rejects.toThrow(
+        'team member split percentages must sum to 100, got 60.00',
+      );
 
       expect(teamRepo.save).not.toHaveBeenCalled();
     });

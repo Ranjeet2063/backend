@@ -109,10 +109,11 @@ export class MilestonesService {
    * are wrapped in a single DB transaction to prevent desync between the
    * Payment ledger and `milestone.distributed` (#117).
    */
-   async resolveIssue(
+  async resolveIssue(
     milestoneId: string,
     issueId: string,
-    recipientAddress: string
+    recipientAddress: string,
+    recipientId?: string,
   ) {
     const milestone = await this.findOne(milestoneId);
     if (!milestone.escrowId) {
@@ -137,7 +138,9 @@ export class MilestonesService {
       );
     }
 
-    const openIssues = milestone.issues.filter((i) => i.state === 'open');
+    const openIssues = milestone.issues.filter(
+      (i) => i.state === IssueState.OPEN,
+    );
 
     // Reject when no issues remain open — fallback to divisor 1 would let a
     // single call drain the entire remaining budget (#115).
@@ -147,7 +150,7 @@ export class MilestonesService {
       );
     }
 
-    if (issue.state !== 'open') {
+    if (issue.state !== IssueState.OPEN) {
       throw new BadRequestException(
         `Issue ${issueId} has already been resolved for milestone ${milestoneId}`,
       );
@@ -159,11 +162,11 @@ export class MilestonesService {
     const share = Math.min(remainingBudget / unresolvedCount, remainingBudget);
 
     return this.dataSource.transaction(async (mgr) => {
-      // FIXED: Aligned argument signature with our 3-arg escrow service update
       const payment = await this.escrowService.releasePartial(
         milestone.escrowId!,
+        share.toFixed(7),
         recipientAddress,
-        share.toFixed(7)
+        recipientId,
       );
 
       const newDistributed = (Number(milestone.distributed) + share).toFixed(7);

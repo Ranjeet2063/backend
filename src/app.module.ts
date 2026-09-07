@@ -22,9 +22,6 @@ import { ReputationModule } from './reputation/reputation.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { IdempotencyModule } from './common/idempotency/idempotency.module';
 
-// Import the new RolesGuard we created
-import { RolesGuard } from './roles.guard';
-
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
@@ -64,13 +61,6 @@ import { RolesGuard } from './roles.guard';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
-    },
-    // This registers RolesGuard globally to secure all role permissions across the entire app
-    // This registers RolesGuard globally to secure all role permissions
-
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
     },
   ],
 })

@@ -14,14 +14,14 @@ import {
   isValidMoneyAmount,
   stroopsToAmount,
 } from '../common/validators/money.validator';
-import { 
-  ContractInvocationResult, 
-  SorobanClientService 
+import {
+  ContractInvocationResult,
+  SorobanClientService,
 } from './soroban-client.service';
-import { 
+import {
   apportionBasisPoints,
   splitStroops,
-  TOTAL_BASIS_POINTS
+  TOTAL_BASIS_POINTS,
 } from './split-math.util';
 import { validatePercentageSplits } from '../common/validators/split-percentage.validator';
 
@@ -193,7 +193,9 @@ export class EscrowService {
     const result = await this.invokeRelease(
       escrow,
       'splitRelease',
-      recipients.map((r, i) => [r.recipientAddress, bps[i]] as [string, number]),
+      recipients.map(
+        (r, i) => [r.recipientAddress, bps[i]] as [string, number],
+      ),
     );
 
     const shares = splitStroops(totalStroops, bps);
@@ -268,17 +270,20 @@ export class EscrowService {
 
     await this.assertRecipientsMatchUsers([{ recipientAddress, recipientId }]);
 
-      const result = await this.invokeOnLockedEscrow(
+    const result = await this.invokeOnLockedEscrow(
       escrow,
       'releasePartial',
       () =>
-        this.soroban.invoke('release_partial', [
-          escrow.milestoneId ?? escrow.bountyId ?? escrow.id,
-          recipientAddress,
-          this.toStroops(amount),
-        ], this.contractOpts(escrow)),
+        this.soroban.invoke(
+          'release_partial',
+          [
+            escrow.milestoneId ?? escrow.bountyId ?? escrow.id,
+            recipientAddress,
+            this.toStroops(amount),
+          ],
+          this.contractOpts(escrow),
+        ),
     );
-
 
     // The Payment insert and the (conditional) escrow-status flip share one
     // transaction so the two can't diverge — same guarantee as release()
@@ -442,10 +447,10 @@ export class EscrowService {
    * rather than only a server log line (#89). The status deliberately stays
    * LOCKED — the funds are still held and the operation can be retried.
    */
-   private async invokeOnLockedEscrow<T = any>(
-    escrow: any,
+  private async invokeOnLockedEscrow<T>(
+    escrow: Escrow,
     operation: string,
-    call: () => Promise<T>
+    call: () => Promise<T>,
   ): Promise<T> {
     try {
       return await call();
@@ -462,7 +467,6 @@ export class EscrowService {
       throw err;
     }
   }
-
 
   /**
    * The escrow contract's single payout entrypoint (#161):

@@ -15,7 +15,7 @@ import { CreateMilestoneDto } from './dto/create-milestone.dto';
 import { Idempotent } from '../common/idempotency/idempotent.decorator';
 import { IsStellarAddress } from '../common/validators/stellar-address.validator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../roles.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../common/enums';
 
@@ -91,6 +91,7 @@ export class MilestonesController {
       id,
       issueId,
       dto.recipientAddress,
+      dto.recipientId,
     );
   }
 
@@ -99,9 +100,6 @@ export class MilestonesController {
   @Roles(UserRole.MAINTAINER)
   @Post(':id/allocate')
   allocateBudget(@Param('id', new ParseUUIDPipe()) id: string) {
-    // Using a type assertion to allow dynamic route checking without altering the service file
-    return (this.milestonesService as any).allocateBudget
-      ? (this.milestonesService as any).allocateBudget(id)
-      : Promise.resolve({ id, status: 'budget_allocated' });
+    return this.milestonesService.allocateBudget(id);
   }
 }

@@ -46,7 +46,10 @@ export class BountiesController {
   list(
     @Query('status', new ParseEnumPipe(BountyStatus, { optional: true }))
     status?: BountyStatus,
-    @Query('difficulty', new ParseEnumPipe(BountyDifficulty, { optional: true }))
+    @Query(
+      'difficulty',
+      new ParseEnumPipe(BountyDifficulty, { optional: true }),
+    )
     difficulty?: BountyDifficulty,
     @Query('asset', new ParseEnumPipe(AssetType, { optional: true }))
     asset?: AssetType,

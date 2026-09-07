@@ -10,6 +10,7 @@ import {
   nativeToScVal,
   rpc,
   scValToNative,
+  xdr,
 } from '@stellar/stellar-sdk';
 import { AssetType } from '../common/enums';
 import { AppConfig } from '../config/configuration';
@@ -158,7 +159,7 @@ export class SorobanClientService {
     const contract = this.getContract(opts.contractId);
     const account = await this.server.getAccount(keypair.publicKey());
 
-const scArgs = args.map((arg) => this.toScVal(arg)) as any[];
+    const scArgs = args.map((arg) => this.toScVal(arg));
 
     const tx = new TransactionBuilder(account, {
       fee: BASE_FEE,
@@ -218,7 +219,7 @@ const scArgs = args.map((arg) => this.toScVal(arg)) as any[];
     );
   }
 
-  private toScVal(value: unknown): unknown {
+  private toScVal(value: unknown): xdr.ScVal {
     if (Buffer.isBuffer(value) || value instanceof Uint8Array) {
       // BytesN<32> arguments (metadata hashes, description hashes, etc.)
       // arrive as raw bytes, not strings — without this branch they fell

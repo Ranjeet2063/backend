@@ -245,7 +245,10 @@ describe('MilestonesService', () => {
         escrowId: 'escrow-1',
         budget: '500',
         distributed: '0',
-        issues: [{ id: 'i1', state: 'open' }, { id: 'i2', state: 'open' }],
+        issues: [
+          { id: 'i1', state: 'open' },
+          { id: 'i2', state: 'open' },
+        ],
       });
 
       const payment = await service.resolveIssue(
@@ -373,7 +376,9 @@ describe('MilestonesService', () => {
 
       await expect(
         service.resolveIssue('m1', 'issue-1', 'RECIPIENT'),
-      ).rejects.toThrow('No unresolved issues left to attribute this payout to');
+      ).rejects.toThrow(
+        'No unresolved issues left to attribute this payout to',
+      );
 
       expect(escrowService.releasePartial).not.toHaveBeenCalled();
     });
